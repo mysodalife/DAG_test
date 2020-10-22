@@ -29,7 +29,8 @@ branching = BranchPythonOperator(task_id="branching", python_callable= lambda **
 
 def set_last_timestamp_in_redis(**context):
     timestamp = context['task_instance'].xcom_pull(task_ids='get_timestamp',key='timestamp')
-    logging.debug(timestamp)
+    logging.info("&&&&&&&&&&&&&&&&&&&&")
+    logging.info(timestamp)
     # redis = RedisHook(redis_conn_id='redis_default',).get_conn()
     # redis.set('last_timestamp', timestamp)
 store_in_redis =  PythonOperator(task_id='store_in_redis',python_callable=set_last_timestamp_in_redis,provide_context=True,dag=dag)
