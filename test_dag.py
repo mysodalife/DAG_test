@@ -17,7 +17,7 @@ default_arg = {
     # "end_date":datetime(2020,11,11),
     # "execution_timeout":timedelta(seconds=300),
 }
-dag = DAG(dag_id="test-dag", description="this is test demo",default_args=default_arg,schedule_interval=None)
+dag = DAG(dag_id="test-dag", description="this is test demo",default_args=default_arg,schedule_interval='@once')
 def get_timestamp_function(**context):
     context['task_instance'].xcom_push(key='timestamp',value='346')
 
