@@ -26,7 +26,7 @@ get_timestamp = PythonOperator(task_id='get_timestamp', provide_context=True,pyt
 branching = BranchPythonOperator(task_id="branching", python_callable= lambda **context:'store_in_redis' if int(context['task_instance'].xcom_pull(task_ids='get_timestamp',key='timestamp')) % 2 == 0 else 'skip', provide_context=True,dag=dag)
 
 def set_last_timestamp_in_redis(**context):
-    timestamp = context['task_instance'].xcom_pull(task_ids='get_timestamp')
+    timestamp = context['task_instance'].xcom_pull(task_ids='get_timestamp',key='timestamp')
     redis = RedisHook(redis_conn_id='redis_default',).get_conn()
     redis.set('last_timestamp', timestamp)
 store_in_redis =  PythonOperator(task_id='store_in_redis',python_callable=set_last_timestamp_in_redis,provide_context=True,dag=dag)
