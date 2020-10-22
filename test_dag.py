@@ -7,7 +7,7 @@ from airflow.contrib.hooks.redis_hook import RedisHook
 default_arg = {
     "owner":"airflow",   # owner
     "depends_on_past":False, # 是否依赖于上次执行的task
-    "start_date":datetime(2020,11,1),
+    "start_date":datetime(2020,10,1),
     "email": "404997294@qq.com",
     "email_on_failure":False,
     "email_on_retry":False,
@@ -16,6 +16,7 @@ default_arg = {
     "end_date":datetime(2020,11,11),
     "execution_timeout":timedelta(seconds=300),
 }
+
 dag = DAG(dag_id="test-dag", description="this is test demo",default_args=default_arg,schedule_interval=None)
 get_timestamp = BaseOperator(task_id="get_timestamp", bash_command='date + %s',xcom_push=True,dag=dag)
 branching = BranchPythonOperator(task_id="branching", python_callable= lambda **context:'store_in_redis' if int(context['task_instance'].xcom_pull(task_ids='get_timestamp')) % 2 == 0 else 'skip', provide_context=True,dag=dag)
