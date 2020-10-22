@@ -21,7 +21,7 @@ def get_timestamp_function(**context):
     context['task_instance'].xcom_push(key='timestamp',value='346')
 
 
-get_timestamp = PythonOperator(task_id='get_timestamp', provide_context=True,python_callable=get_timestamp_function)
+get_timestamp = PythonOperator(task_id='get_timestamp', provide_context=True,python_callable=get_timestamp_function,dag=dag)
 
 branching = BranchPythonOperator(task_id="branching", python_callable= lambda **context:'store_in_redis' if int(context['task_instance'].xcom_pull(task_ids='get_timestamp',key='timestamp')) % 2 == 0 else 'skip', provide_context=True,dag=dag)
 
