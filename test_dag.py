@@ -4,17 +4,18 @@ from airflow.operators.bash_operator import BaseOperator
 from airflow.operators.python_operator import BranchPythonOperator,PythonOperator
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.contrib.hooks.redis_hook import RedisHook
+from airflow.utils.dates import days_ago
 default_arg = {
     "owner":"airflow",   # owner
     "depends_on_past":False, # 是否依赖于上次执行的task
-    "start_date":datetime(2020,10,1),
-    "email": "404997294@qq.com",
-    "email_on_failure":False,
-    "email_on_retry":False,
-    "retries":1,
-    "retry_delay":timedelta(minutes=5),
-    "end_date":datetime(2020,11,11),
-    "execution_timeout":timedelta(seconds=300),
+    "start_date":days_ago(2),
+    # "email": "404997294@qq.com",
+    # "email_on_failure":False,
+    # "email_on_retry":False,
+    # "retries":1,
+    # "retry_delay":timedelta(minutes=5),
+    # "end_date":datetime(2020,11,11),
+    # "execution_timeout":timedelta(seconds=300),
 }
 dag = DAG(dag_id="test-dag", description="this is test demo",default_args=default_arg,schedule_interval=None)
 def get_timestamp_function(**context):
