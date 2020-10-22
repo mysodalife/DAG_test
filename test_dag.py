@@ -16,10 +16,14 @@ default_arg = {
     "end_date":datetime(2020,11,11),
     "execution_timeout":timedelta(seconds=300),
 }
-
 dag = DAG(dag_id="test-dag", description="this is test demo",default_args=default_arg,schedule_interval=None)
-get_timestamp = BaseOperator(task_id="get_timestamp", bash_command='date + %s',xcom_push=True,dag=dag)
-branching = BranchPythonOperator(task_id="branching", python_callable= lambda **context:'store_in_redis' if int(context['task_instance'].xcom_pull(task_ids='get_timestamp')) % 2 == 0 else 'skip', provide_context=True,dag=dag)
+def get_timestamp_function(**context):
+    context['task_instance'].xcom_push(key='timestamp',value='346')
+
+
+get_timestamp = PythonOperator(task_id='get_timestamp', provide_context=True,python_callable=get_timestamp_function)
+
+branching = BranchPythonOperator(task_id="branching", python_callable= lambda **context:'store_in_redis' if int(context['task_instance'].xcom_pull(task_ids='get_timestamp',key='timestamp')) % 2 == 0 else 'skip', provide_context=True,dag=dag)
 
 def set_last_timestamp_in_redis(**context):
     timestamp = context['task_instance'].xcom_pull(task_ids='get_timestamp')
