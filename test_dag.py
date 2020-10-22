@@ -5,6 +5,7 @@ from airflow.operators.python_operator import BranchPythonOperator,PythonOperato
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.contrib.hooks.redis_hook import RedisHook
 from airflow.utils.dates import days_ago
+import logging
 default_arg = {
     "owner":"airflow",   # owner
     "depends_on_past":False, # 是否依赖于上次执行的task
@@ -28,8 +29,9 @@ branching = BranchPythonOperator(task_id="branching", python_callable= lambda **
 
 def set_last_timestamp_in_redis(**context):
     timestamp = context['task_instance'].xcom_pull(task_ids='get_timestamp',key='timestamp')
-    redis = RedisHook(redis_conn_id='redis_default',).get_conn()
-    redis.set('last_timestamp', timestamp)
+    logging.debug(timestamp)
+    # redis = RedisHook(redis_conn_id='redis_default',).get_conn()
+    # redis.set('last_timestamp', timestamp)
 store_in_redis =  PythonOperator(task_id='store_in_redis',python_callable=set_last_timestamp_in_redis,provide_context=True,dag=dag)
 skip = DummyOperator(task_id='skip', dag=dag)
 get_timestamp >> branching >> [store_in_redis, skip]
